@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
 import LoginPage from "@/pages/LoginPage.vue";
+import { useUserStore } from '@/stores/user'
 
 const routes = [
   {
@@ -21,15 +22,15 @@ const router = createRouter({
   routes,
 });
 
-// 👮 Global navigation guard
-router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem("github_token");
 
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    next("/login"); // redirect to login if not authenticated
+router.beforeEach((to, from, next) => {
+  const store = useUserStore()
+
+  if (to.meta.requiresAuth && !store.isAuthenticated) {
+    next('/login')
   } else {
-    next(); // allow
+    next()
   }
-});
+})
 
 export default router;
