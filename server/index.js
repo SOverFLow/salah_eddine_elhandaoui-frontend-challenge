@@ -29,7 +29,10 @@ app.post('/auth/github/token', async (req, res) => {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
 
-    res.json({ user: userRes.data })
+    res.json({ 
+      user: userRes.data, 
+      token: accessToken
+    });
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to authenticate' })

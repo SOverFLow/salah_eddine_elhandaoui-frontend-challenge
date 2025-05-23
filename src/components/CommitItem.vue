@@ -1,16 +1,20 @@
 <template>
-  <div class="bg-white border p-2 rounded my-1 shadow-sm">
-    <p class="text-gray-800 font-medium">{{ commit.message }}</p>
-    <p class="text-sm text-gray-500">by {{ commit.author }}</p>
+  <div class="commit-item">
+    <h4>{{ commit.commit.message }}</h4>
+    <small>{{ commit.commit.author.name }} - {{ commit.commit.author.date }}</small>
   </div>
 </template>
 
-<script setup lang="ts">
-defineProps<{
-  commit: {
-    id: number,
-    message: string,
-    author: string
-  }
-}>()
+<script setup>
+const props = defineProps({
+  commit: Object,
+})
 </script>
+
+<style scoped>
+.commit-item {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+</style>

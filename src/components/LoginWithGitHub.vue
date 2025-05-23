@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+const loading = ref(false);
 import { onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
@@ -42,6 +43,7 @@ onMounted(async () => {
   const url = new URL(window.location.href);
   const code = url.searchParams.get("code");
   if (code) {
+    loading.value = true;
     const res = await fetch("http://localhost:4000/auth/github/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,11 +51,14 @@ onMounted(async () => {
     });
 
     const data = await res.json();
-    if (data.user) {
-      store.setUser(data.user);
-      router.push("/");
+    loading.value = false;
+
+    if (data.user && data.token) {
+      store.setUser(data.user)
+      store.setToken(data.token)
+      router.push('/')
     } else {
-      alert("Login failed.");
+      alert('Login failed.')
     }
   }
 });
