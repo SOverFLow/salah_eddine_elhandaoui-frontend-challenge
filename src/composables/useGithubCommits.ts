@@ -1,59 +1,93 @@
-import { ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '@/stores/user'
 
-export function useGithubCommits() {
-  const commits = ref<any[]>([])
-  const page = ref(1)
-  const hasMore = ref(true)
+interface Commit {
+  sha: string
+  commit: {
+    message: string
+    author: {
+      name: string
+      date: string
+    }
+  }
+  author: {
+    login: string
+    avatar_url: string
+  } | null
+  html_url: string
+}
+
+export default function useGithubCommits(
+  repoFullName: Ref<string>, 
+  branch: Ref<string>
+) {
+  const commits = ref<Commit[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const hasMore = ref(true)
+  const page = ref(1)
 
-  const fetchCommits = async (repoName: string, branch: string, reset = false) => {
-    if (loading.value || !hasMore.value) return
-
-    if (reset) {
-      commits.value = []
-      page.value = 1
-      hasMore.value = true
-    }
-
+  const loadMore = async () => {
+    if (loading.value || !repoFullName.value || !branch.value || !hasMore.value) return
+  
     loading.value = true
     error.value = null
-
+    
     try {
       const userStore = useUserStore()
-      const res = await axios.get(`https://api.github.com/repos/${userStore.username}/${repoName}/commits`, {
-        headers: {
-          Authorization: `Bearer ${userStore.token}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
-        params: {
-          sha: branch,
-          per_page: 10,
-          page: page.value,
-        },
-      })
-
-      if (res.data.length < 10) {
-        hasMore.value = false
-      }
-
-      commits.value.push(...res.data)
+      
+      const res = await axios.get(
+        `https://api.github.com/repos/${repoFullName.value}/commits`,
+        {
+          headers: {
+            Authorization: `Bearer ${userStore.token}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+          params: {
+            sha: branch.value,
+            per_page: 20,
+            page: page.value,
+          },
+        }
+      )
+  
+      if (res.data.length < 20) hasMore.value = false
+      commits.value = [...commits.value, ...res.data]
       page.value++
+  
     } catch (err: any) {
-      console.error(err)
-      error.value = 'Failed to fetch commits.'
+      if (err.response?.status === 404) {
+        error.value = `Repository or branch not found: ${repoFullName.value}/${branch.value}`
+        commits.value = []
+        hasMore.value = false
+      } else {
+        error.value = err.message
+      }
     } finally {
       loading.value = false
     }
   }
+
+  const resetCommits = () => {
+    commits.value = []
+    page.value = 1
+    hasMore.value = true
+    loadMore()
+  }
+
+  watch([repoFullName, branch], () => {
+    if (repoFullName.value && branch.value) {
+      resetCommits()
+    }
+  })
 
   return {
     commits,
     loading,
     error,
     hasMore,
-    fetchCommits,
+    loadMore,
+    resetCommits,
   }
 }
