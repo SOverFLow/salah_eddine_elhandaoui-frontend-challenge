@@ -1,20 +1,39 @@
 <template>
-  <div class="space-y-2">
-    <input
-      type="text"
-      v-model="filter"
-      placeholder="Find a repository..."
-      class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-    <ul class="space-y-1">
+  <div class="p-4 bg-gray-50 border-r border-gray-200 h-full">
+    <div class="relative">
+      <input
+        type="text"
+        v-model="filter"
+        placeholder="Search repositories..."
+        class="w-full px-4 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        @input="handleInput"
+      />
+    </div>
+
+    <ul class="mt-2 space-y-1">
       <li
         v-for="repo in filteredRepos"
         :key="repo.id"
         @click="handleClick(repo)"
-        class="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+        class="group px-3 py-2 text-sm rounded-md cursor-pointer transition-colors hover:bg-gray-100"
         :class="{ 'bg-blue-50 border border-blue-200': repo.full_name === selected }"
       >
-        {{ repo.name }}
+        <div class="font-medium text-gray-900">
+          <span v-html="highlightMatch(repo.name, filter)" />
+        </div>
+        <div 
+          v-if="repo.description"
+          class="text-xs text-gray-500 mt-1 truncate"
+        >
+          <span v-html="highlightMatch(repo.description, filter)" />
+        </div>
+      </li>
+      
+      <li 
+        v-if="filteredRepos.length === 0"
+        class="px-3 py-2 text-sm text-gray-500"
+      >
+        No repositories found matching "{{ filter }}"
       </li>
     </ul>
   </div>
@@ -40,47 +59,33 @@ const emit = defineEmits<{
 }>()
 
 const filter = ref('')
-const filteredRepos = computed(() =>
-  props.repos.filter(r =>
-    r.name.toLowerCase().includes(filter.value.toLowerCase()) ||
-    (r.description && r.description.toLowerCase().includes(filter.value.toLowerCase()))
-  )
-)
+
+const filteredRepos = computed(() => {
+  const query = filter.value.toLowerCase()
+  if (!query) return props.repos
+
+  return props.repos.filter(r => {
+    const nameMatch = r.name.toLowerCase().includes(query)
+    const descMatch = r.description?.toLowerCase().includes(query) ?? false
+    return nameMatch || descMatch
+  })
+})
+
+const highlightMatch = (text: string, query: string) => {
+  if (!query) return text
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escapedQuery})`, 'gi')
+  return text.replace(regex, '<span class="bg-yellow-100 font-medium">$1</span>')
+}
 
 const handleClick = (repo: Repository) => {
   if (repo?.full_name) {
-    console.log('Emitting repo:', repo.full_name)
+    filter.value = '' // Clear filter on selection
     emit('select', repo.full_name)
-  } else {
-    console.error('Invalid repo object:', repo)
   }
 }
+
+const handleInput = () => {
+  // Optional: Add debounce if needed
+}
 </script>
-
-<style scoped>
-.repo-list {
-  padding: 16px;
-  background-color: #f6f8fa;
-}
-
-.filter-input {
-  width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 16px;
-  border: 1px solid #e1e4e8;
-  border-radius: 6px;
-}
-
-li {
-  padding: 12px 16px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.selected {
-  background-color: #0366d6;
-  color: white;
-}
-</style>
