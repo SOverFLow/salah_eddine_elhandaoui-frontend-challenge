@@ -6,7 +6,7 @@
 
 A secure GitHub repository explorer with authentication and commit visualization.
 
-![App Screenshot](./screenshoot/screenshot.png)
+![App Screenshot](./screenshoot/screenshot.PNG)
 
 ## Features
 
