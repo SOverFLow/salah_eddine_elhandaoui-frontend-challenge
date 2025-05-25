@@ -80,12 +80,9 @@ const highlightMatch = (text: string, query: string) => {
 
 const handleClick = (repo: Repository) => {
   if (repo?.full_name) {
-    filter.value = '' // Clear filter on selection
+    filter.value = ''
     emit('select', repo.full_name)
   }
 }
 
-const handleInput = () => {
-  // Optional: Add debounce if needed
-}
 </script>

@@ -1,19 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <header class="fixed top-0 right-0 left-0 z-50 bg-[#0d1117] border-b border-gray-800">
-      <div class="container mx-auto px-4 h-16 flex items-center justify-end">
-        <div class="flex items-center gap-3 flex-row-reverse">
-          <img 
-            :src="userStore.user.avatar_url" 
-            alt="User avatar"
-            class="w-8 h-8 rounded-full border-2 border-gray-600 hover:border-gray-400 transition-all"
-          />
-          <span class="text-gray-300 font-medium text-sm hover:text-white transition-colors">
-            {{ userStore.user.login }}
-          </span>
-        </div>
-      </div>
-    </header>
+    <AppHeader :user="userStore.user" />
 
     <div class="flex pt-16 h-screen">
       <aside class="w-80 border-r bg-white border-gray-200 overflow-y-auto p-4">
@@ -103,6 +90,7 @@ import { useGithubRepos } from "@/composables/useGithubRepos";
 import { useGithubBranches } from "@/composables/useGithubBranches";
 import useGithubCommits from "@/composables/useGithubCommits";
 import { useUserStore } from "@/stores/user";
+import AppHeader from '@/components/AppHeader.vue';
 
 const userStore = useUserStore();
 

@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.user && !!state.token,
     username: (state) => state.user?.login || '',
     avatar: (state) => state.user?.avatar_url || '',
+    name: (state) => state.user?.name || '',
   },
   actions: {
     setUser(user: GithubUser) {
