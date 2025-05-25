@@ -1,37 +1,55 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-
-interface GithubUser {
-  login: string
-  name?: string
-  avatar_url?: string
-  email?: string
-  html_url?: string
-  [key: string]: any
+export interface GithubUser {
+  login: string;
+  name?: string;
+  avatar_url?: string;
+  email?: string;
+  html_url?: string;
+  [key: string]: any;
 }
 
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    user: null as GithubUser | null,
-    token: null as string | null,
+interface UserState {
+  user: GithubUser | null;
+  token: string | null;
+}
+
+export const useUserStore = defineStore("user", {
+  state: (): UserState => ({
+    user: null,
+    token: null,
   }),
+
   getters: {
-    isAuthenticated: (state) => !!state.user && !!state.token,
-    username: (state) => state.user?.login || '',
-    avatar: (state) => state.user?.avatar_url || '',
-    name: (state) => state.user?.name || '',
+    isAuthenticated: (state): boolean => !!state.user && !!state.token,
+    username: (state): string => state.user?.login || "",
+    avatar: (state): string => state.user?.avatar_url || "",
+    name: (state): string => state.user?.name || "",
+    githubProfileUrl: (state): string => state.user?.html_url || "",
   },
+
   actions: {
     setUser(user: GithubUser) {
-      this.user = user
+      if (!user || typeof user.login !== "string") {
+        console.warn("Invalid user payload:", user);
+        return;
+      }
+      this.user = user;
     },
+
     setToken(token: string) {
-      this.token = token
+      if (!token) {
+        console.warn("Empty token");
+        return;
+      }
+      this.token = token;
     },
+
     clearUser() {
-      this.user = null
-      this.token = null
+      this.user = null;
+      this.token = null;
     },
   },
+
   persist: true,
-})
+});

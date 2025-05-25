@@ -1,5 +1,7 @@
 <template>
-  <header class="bg-gray-900 border-b border-gray-800 shadow-lg">
+  <header
+    class="fixed top-0 inset-x-0 z-50 bg-gray-900 border-b border-gray-800 shadow-lg"
+  >
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <h1 class="text-white font-semibold text-lg">GitHub Viewer</h1>
@@ -17,8 +19,13 @@
             :alt="`${user.login}'s avatar`"
             class="w-8 h-8 rounded-full border-2 border-gray-600"
           />
-          <span class="text-gray-300 font-medium text-sm">{{ user.login }}</span>
-          <ChevronDownIcon class="w-4 h-4 text-gray-400 transition-transform" :class="{ 'rotate-180': isDropdownOpen }" />
+          <span class="text-gray-300 font-medium text-sm">{{
+            user.login
+          }}</span>
+          <ChevronDownIcon
+            class="w-4 h-4 text-gray-400 transition-transform"
+            :class="{ 'rotate-180': isDropdownOpen }"
+          />
         </button>
 
         <transition
@@ -35,7 +42,9 @@
             role="menu"
           >
             <div class="px-4 py-3 border-b border-gray-700">
-              <p class="text-sm text-white font-medium truncate">{{ user.name }}</p>
+              <p class="text-sm text-white font-medium truncate">
+                {{ user.name }}
+              </p>
             </div>
             <button
               @click="handleLogout"
@@ -53,18 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
-import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
-import LogoutIcon from '@/components/icons/LogoutIcon.vue';
-import type { User } from '@/types/user';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
+import LogoutIcon from "@/components/icons/LogoutIcon.vue";
+import type { User } from "@/types/user";
 
-type Props = {
-  user: User | null;
-};
-
-const props = defineProps<Props>();
+const props = defineProps<{ user: User | null }>();
 const router = useRouter();
 const isDropdownOpen = ref(false);
 
@@ -78,7 +83,7 @@ const closeDropdown = () => {
 
 const handleLogout = async () => {
   try {
-    await router.push('/login');
+    await router.push("/login");
   } finally {
     useUserStore().clearUser();
     closeDropdown();

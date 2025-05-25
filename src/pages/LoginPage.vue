@@ -23,5 +23,5 @@
 </template>
 
 <script setup>
-import LoginWithGitHub from "../components/LoginWithGitHub.vue";
+import LoginWithGitHub from "@/components/auth/LoginWithGitHub.vue";
 </script>

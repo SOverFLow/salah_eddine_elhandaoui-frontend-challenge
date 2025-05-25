@@ -1,20 +1,29 @@
 <template>
-  <div class="commit-item">
-    <h4>{{ commit.commit.message }}</h4>
-    <small>{{ commit.commit.author.name }} - {{ commit.commit.author.date }}</small>
+  <div class="mb-4 pb-3 border-b border-gray-200">
+    <h4 class="text-sm font-medium text-gray-900">
+      {{ commit.commit.message }}
+    </h4>
+    <small class="text-xs text-gray-500">
+      {{ commit.commit.author.name }} -
+      {{ formatDate(commit.commit.author.date) }}
+    </small>
   </div>
 </template>
 
-<script setup>
-const props = defineProps({
-  commit: Object,
-})
-</script>
+<script setup lang="ts">
+import { useCommitList } from "@/composables/useCommitList";
 
-<style scoped>
-.commit-item {
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-</style>
+const props = defineProps<{
+  commit: {
+    commit: {
+      message: string;
+      author: {
+        name: string;
+        date: string;
+      };
+    };
+  };
+}>();
+
+const { formatDate } = useCommitList();
+</script>
